@@ -10,6 +10,10 @@ export declare class PropertiesController {
         price: number;
         description: string;
         image: string;
+        agentName: string;
+        agentCompany: string;
+        agentPhone: string;
+        agentAvatar: string;
     }[]>;
     findOne(id: number): Promise<{
         id: number;
@@ -19,5 +23,9 @@ export declare class PropertiesController {
         price: number;
         description: string;
         image: string;
+        agentName: string;
+        agentCompany: string;
+        agentPhone: string;
+        agentAvatar: string;
     } | null>;
 }

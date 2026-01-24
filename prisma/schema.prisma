@@ -25,6 +25,10 @@ model Property {
   image       String
   createdAt   DateTime   @default(now())
   favorites   Favorite[]
+  agentName    String
+  agentCompany String
+  agentPhone   String
+  agentAvatar  String
 }
 
 model Favorite {

@@ -11,6 +11,10 @@ export declare class FavoritesController {
             price: number;
             description: string;
             image: string;
+            agentName: string;
+            agentCompany: string;
+            agentPhone: string;
+            agentAvatar: string;
         };
     } & {
         id: number;
@@ -27,6 +31,10 @@ export declare class FavoritesController {
             price: number;
             description: string;
             image: string;
+            agentName: string;
+            agentCompany: string;
+            agentPhone: string;
+            agentAvatar: string;
         };
     } & {
         id: number;
