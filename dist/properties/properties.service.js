@@ -18,10 +18,7 @@ let PropertiesService = class PropertiesService {
         this.prisma = prisma;
     }
     async onModuleInit() {
-        const count = await this.prisma.property.count();
-        if (count === 0) {
-            await this.seedProperties();
-        }
+        await this.seedProperties();
     }
     async seedProperties() {
         const mockProperties = [
@@ -125,10 +122,18 @@ let PropertiesService = class PropertiesService {
                 agentAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
             },
         ];
-        await this.prisma.property.createMany({
-            data: mockProperties,
-        });
-        console.log('Seeded properties with agent details successfully');
+        for (const prop of mockProperties) {
+            const existing = await this.prisma.property.findFirst({
+                where: { title: prop.title },
+            });
+            if (!existing) {
+                await this.prisma.property.create({
+                    data: prop,
+                });
+                console.log(`Seeded: ${prop.title}`);
+            }
+        }
+        console.log('Seeding check complete (No duplicates created).');
     }
     async findAll() {
         return this.prisma.property.findMany({

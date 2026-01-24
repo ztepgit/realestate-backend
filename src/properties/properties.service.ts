@@ -6,12 +6,8 @@ export class PropertiesService implements OnModuleInit {
   constructor(private prisma: PrismaService) {}
 
   async onModuleInit() {
-    const count = await this.prisma.property.count();
-
-    // เช็คว่าถ้ายังไม่มีข้อมูล ให้ทำการ Seed
-    if (count === 0) {
-      await this.seedProperties();
-    }
+    // เรียกฟังก์ชัน Seed เสมอ (เราจะไปเช็คซ้ำข้างในฟังก์ชันแทน)
+    await this.seedProperties();
   }
 
   async seedProperties() {
@@ -135,10 +131,23 @@ export class PropertiesService implements OnModuleInit {
       },
     ];
 
-    await this.prisma.property.createMany({
-      data: mockProperties,
-    });
-    console.log('Seeded properties with agent details successfully');
+    // --- วนลูปเช็คทีละอัน (ป้องกันข้อมูลเบิ้ล) ---
+    for (const prop of mockProperties) {
+      // 1. ลองหาใน DB ดูว่ามี Property ชื่อนี้หรือยัง?
+      const existing = await this.prisma.property.findFirst({
+        where: { title: prop.title },
+      });
+
+      // 2. ถ้ายังไม่มี ให้สร้างใหม่ (ถ้ามีแล้ว ข้ามไปเลย)
+      if (!existing) {
+        await this.prisma.property.create({
+          data: prop,
+        });
+        console.log(`Seeded: ${prop.title}`);
+      }
+    }
+
+    console.log('Seeding check complete (No duplicates created).');
   }
 
   async findAll() {

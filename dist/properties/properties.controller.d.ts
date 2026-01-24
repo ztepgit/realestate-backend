@@ -4,12 +4,12 @@ export declare class PropertiesController {
     constructor(propertiesService: PropertiesService);
     findAll(): Promise<{
         id: number;
-        createdAt: Date;
         title: string;
         location: string;
         price: number;
         description: string;
         image: string;
+        createdAt: Date;
         agentName: string;
         agentCompany: string;
         agentPhone: string;
@@ -17,12 +17,12 @@ export declare class PropertiesController {
     }[]>;
     findOne(id: number): Promise<{
         id: number;
-        createdAt: Date;
         title: string;
         location: string;
         price: number;
         description: string;
         image: string;
+        createdAt: Date;
         agentName: string;
         agentCompany: string;
         agentPhone: string;
