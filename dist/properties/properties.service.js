@@ -34,7 +34,7 @@ let PropertiesService = class PropertiesService {
                 agentName: 'Sarah Jenkins',
                 agentCompany: 'Urban Living Realty',
                 agentPhone: '(212) 555-0123',
-                agentAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop',
+                agentAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400',
             },
             {
                 title: 'Beachfront Villa',
@@ -45,7 +45,7 @@ let PropertiesService = class PropertiesService {
                 agentName: 'Michael Chen',
                 agentCompany: 'Coastal Dreams Real Estate',
                 agentPhone: '(305) 555-0199',
-                agentAvatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop',
+                agentAvatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400',
             },
             {
                 title: 'Suburban Family Home',
@@ -56,7 +56,7 @@ let PropertiesService = class PropertiesService {
                 agentName: 'Emily Rodriguez',
                 agentCompany: 'Family First Properties',
                 agentPhone: '(512) 555-0144',
-                agentAvatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop',
+                agentAvatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400',
             },
             {
                 title: 'Mountain Retreat',
@@ -67,7 +67,7 @@ let PropertiesService = class PropertiesService {
                 agentName: 'David Wilson',
                 agentCompany: 'Peak Performance Realty',
                 agentPhone: '(303) 555-0177',
-                agentAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop',
+                agentAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
             },
             {
                 title: 'Urban Loft',
@@ -78,7 +78,7 @@ let PropertiesService = class PropertiesService {
                 agentName: 'Jessica Kim',
                 agentCompany: 'Tech City Homes',
                 agentPhone: '(415) 555-0188',
-                agentAvatar: 'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=400&h=400&fit=crop',
+                agentAvatar: 'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=400',
             },
             {
                 title: 'Historic Townhouse',
@@ -89,7 +89,7 @@ let PropertiesService = class PropertiesService {
                 agentName: 'Robert Taylor',
                 agentCompany: 'Heritage Homes',
                 agentPhone: '(617) 555-0155',
-                agentAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop',
+                agentAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
             },
             {
                 title: 'Modern Luxury Villa',
@@ -100,7 +100,7 @@ let PropertiesService = class PropertiesService {
                 agentName: 'James Anderson',
                 agentCompany: 'Elite Estates LA',
                 agentPhone: '(310) 555-0122',
-                agentAvatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop',
+                agentAvatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400',
             },
             {
                 title: 'Charming Cottage',
@@ -111,7 +111,7 @@ let PropertiesService = class PropertiesService {
                 agentName: 'Linda Martinez',
                 agentCompany: 'Southern Charm Realty',
                 agentPhone: '(615) 555-0133',
-                agentAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop',
+                agentAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400',
             },
             {
                 title: 'Classic Family Estate',
@@ -122,7 +122,7 @@ let PropertiesService = class PropertiesService {
                 agentName: 'William Thompson',
                 agentCompany: 'Prestige Properties',
                 agentPhone: '(312) 555-0166',
-                agentAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+                agentAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
             },
         ];
         await this.prisma.property.createMany({
