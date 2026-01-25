@@ -6,9 +6,9 @@ import { Pool } from 'pg'; // 2. import pg pool
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const isProd = process.env.NODE_ENV === 'production';
 
   // 3. เตรียม Pool สำหรับ connect Database
-  // เอาค่า connectionString มาจาก .env ของคุณ
   const dbPool = new Pool({
     connectionString: process.env.DATABASE_URL,
   });
@@ -22,9 +22,14 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
+  app.set('trust proxy', 1);
+
+  
+
+
   app.use(
     session({
-      // ✅ 5. เพิ่มบรรทัดนี้: บอกให้เก็บใน Database แทน RAM
+      // 5. เพิ่มบรรทัดนี้: บอกให้เก็บใน Database แทน RAM
       store: new PGStore({
         pool: dbPool,
         tableName: 'session', // ชื่อตารางที่เราเพิ่งสร้าง
@@ -38,15 +43,16 @@ async function bootstrap() {
       cookie: {
         maxAge: 24 * 60 * 60 * 1000,
         httpOnly: true,
-        secure: false,
-        sameSite: 'lax', // OK ถ้า origin เป๊ะ
+        secure: isProd,                     //  prod = true
+        sameSite: isProd ? 'none' : 'lax',  //  cross-domain
+
       },
     }),
   );
 
   const port = process.env.PORT || 8080;
   await app.listen(port);
-  console.log(`🚀 Server running on http://localhost:${port}`);
+  console.log(`Server running on ${isProd ? 'production' : 'local'} port ${port}`);
 }
 
 bootstrap().catch((err) => {
