@@ -17,7 +17,7 @@ async function bootstrap() {
   }
 
   const dbPool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: process.env.DIRECT_URL,
   });
 
   const PGStore = pgSession(session);
