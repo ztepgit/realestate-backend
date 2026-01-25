@@ -10,6 +10,9 @@ const connect_pg_simple_1 = __importDefault(require("connect-pg-simple"));
 const pg_1 = require("pg");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    const isProd = process.env.NODE_ENV === 'production';
+    const server = app.getHttpAdapter().getInstance();
+    server.set('trust proxy', 1);
     const dbPool = new pg_1.Pool({
         connectionString: process.env.DATABASE_URL,
     });
@@ -34,13 +37,13 @@ async function bootstrap() {
         cookie: {
             maxAge: 24 * 60 * 60 * 1000,
             httpOnly: true,
-            secure: false,
-            sameSite: 'lax',
+            secure: isProd,
+            sameSite: isProd ? 'none' : 'lax',
         },
     }));
     const port = process.env.PORT || 8080;
     await app.listen(port);
-    console.log(`🚀 Server running on http://localhost:${port}`);
+    console.log(`Server running on ${isProd ? 'production' : 'local'} port ${port}`);
 }
 bootstrap().catch((err) => {
     console.error(err);

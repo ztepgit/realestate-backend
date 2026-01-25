@@ -8,12 +8,15 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const isProd = process.env.NODE_ENV === 'production';
 
-  // 3. เตรียม Pool สำหรับ connect Database
+  // trust proxy (ต้องทำผ่าน express)
+  const server = app.getHttpAdapter().getInstance();
+  server.set('trust proxy', 1);
+
   const dbPool = new Pool({
     connectionString: process.env.DATABASE_URL,
   });
 
-  const PGStore = pgSession(session); // 4. สร้าง Store
+  const PGStore = pgSession(session);
 
   app.enableCors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -22,18 +25,12 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
-  app.set('trust proxy', 1);
-
-  
-
-
   app.use(
     session({
-      // 5. เพิ่มบรรทัดนี้: บอกให้เก็บใน Database แทน RAM
       store: new PGStore({
         pool: dbPool,
-        tableName: 'session', // ชื่อตารางที่เราเพิ่งสร้าง
-        createTableIfMissing: true, // สร้างตารางให้อัตโนมัติถ้ายังไม่มี
+        tableName: 'session',
+        createTableIfMissing: true,
       }),
       name: 'connect.sid',
       secret: process.env.SESSION_SECRET || 'my-secret-key',
@@ -43,9 +40,8 @@ async function bootstrap() {
       cookie: {
         maxAge: 24 * 60 * 60 * 1000,
         httpOnly: true,
-        secure: isProd,                     //  prod = true
-        sameSite: isProd ? 'none' : 'lax',  //  cross-domain
-
+        secure: isProd,
+        sameSite: isProd ? 'none' : 'lax',
       },
     }),
   );
