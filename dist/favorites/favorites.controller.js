@@ -37,7 +37,7 @@ let FavoritesController = class FavoritesController {
         }
         return this.favoritesService.create({
             userId: Number(userId),
-            propertyId: Number(body.propertyId)
+            propertyId: Number(body.propertyId),
         });
     }
     async remove(req, body) {
@@ -50,7 +50,7 @@ let FavoritesController = class FavoritesController {
         }
         return this.favoritesService.remove({
             userId: Number(userId),
-            propertyId: Number(body.propertyId)
+            propertyId: Number(body.propertyId),
         });
     }
 };

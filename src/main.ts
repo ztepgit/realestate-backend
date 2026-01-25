@@ -40,7 +40,6 @@ async function bootstrap() {
         httpOnly: true,
         secure: false,
         sameSite: 'lax', // OK ถ้า origin เป๊ะ
-
       },
     }),
   );

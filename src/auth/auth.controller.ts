@@ -14,7 +14,7 @@ import { SignupSchema, LoginSchema } from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {}
 
   @Post('signup')
   async signup(@Body() body: unknown) {
@@ -27,10 +27,7 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(
-    @Body() body: unknown,
-    @Req() req: Request,
-  ) {
+  async login(@Body() body: unknown, @Req() req: Request) {
     const result = LoginSchema.safeParse(body);
     if (!result.success) {
       throw new BadRequestException(result.error.issues[0].message);
@@ -45,7 +42,6 @@ export class AuthController {
 
     return user;
   }
-
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
