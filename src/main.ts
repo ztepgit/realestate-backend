@@ -1,25 +1,46 @@
 import { NestFactory } from '@nestjs/core';
-//import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import session from 'express-session';
+import pgSession from 'connect-pg-simple'; // 1. import ตัวนี้มา
+import { Pool } from 'pg'; // 2. import pg pool
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.enableCors({
-    origin: 'http://localhost:3000',
-    credentials: true,
+  // 3. เตรียม Pool สำหรับ connect Database
+  // เอาค่า connectionString มาจาก .env ของคุณ
+  const dbPool = new Pool({
+    connectionString: process.env.DATABASE_URL,
   });
 
-  // 2. ✅ ตั้งค่า Session และเวลาหมดอายุ
+  const PGStore = pgSession(session); // 4. สร้าง Store
+
+  app.enableCors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
+
   app.use(
     session({
-      secret: 'my-secret-key', // เปลี่ยนเป็นรหัสลับของคุณ
+      // ✅ 5. เพิ่มบรรทัดนี้: บอกให้เก็บใน Database แทน RAM
+      store: new PGStore({
+        pool: dbPool,
+        tableName: 'session', // ชื่อตารางที่เราเพิ่งสร้าง
+        createTableIfMissing: true, // สร้างตารางให้อัตโนมัติถ้ายังไม่มี
+      }),
+      name: 'connect.sid',
+      secret: process.env.SESSION_SECRET || 'my-secret-key',
       resave: false,
       saveUninitialized: false,
+      rolling: true,
       cookie: {
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 👈 7 วัน (หน่วยเป็น Millisecond)
-        httpOnly: true, // ปลอดภัย JS แอบอ่านไม่ได้
+        maxAge: 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax', // OK ถ้า origin เป๊ะ
+
       },
     }),
   );

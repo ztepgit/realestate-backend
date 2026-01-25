@@ -4,41 +4,69 @@ import {
   Post,
   Delete,
   Body,
-  Param,
-  ParseIntPipe,
+  
+  
   BadRequestException,
+  
+  Req,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
-import { CreateFavoriteSchema, DeleteFavoriteSchema } from './dto/favorite.dto';
+
 
 @Controller('favorites')
 export class FavoritesController {
   constructor(private favoritesService: FavoritesService) {}
 
-  @Post()
-  async create(@Body() body: unknown) {
-    const result = CreateFavoriteSchema.safeParse(body);
+  // ✅ 1. เพิ่ม endpoint นี้ไว้บนสุด! (สำคัญมากต้องอยู่ก่อน :userId)
+  @Get('my-favorites') 
+  async getMyFavorites(@Req() req: any) {
+    // ดึง User ID จาก Session (Login อยู่ไหม?)
+    const userId = req.session?.user?.id;
 
-    if (!result.success) {
-      throw new BadRequestException(result.error.issues[0].message);
+  if (!userId) {
+    throw new UnauthorizedException('Please login');
+  }
+
+  return this.favoritesService.findByUser(Number(userId));
+}
+
+  @Post()
+  async create(@Req() req: any, @Body() body: any) { // ใช้ any ชั่วคราวเพื่อให้รันผ่าน
+    // 1.ดึง User ID จาก Session (ปลอดภัยกว่า)
+    const userId = req.session?.user?.id; 
+    if (!userId) {
+      throw new UnauthorizedException('Please login first');
     }
 
-    return this.favoritesService.create(result.data);
+    // 2. Validate Body (เอาแค่ propertyId)
+    // หมายเหตุ: อาจต้องแก้ Zod Schema ให้ userId เป็น optional หรือไม่ต้องส่งมา
+    if (!body.propertyId) {
+        throw new BadRequestException('Property ID is required');
+    }
+
+    return this.favoritesService.create({ 
+      userId: Number(userId), 
+      propertyId: Number(body.propertyId) 
+    });
   }
 
-  @Get(':userId')
-  findByUser(@Param('userId', ParseIntPipe) userId: number) {
-    return this.favoritesService.findByUser(userId);
-  }
+  
 
   @Delete()
-  async remove(@Body() body: unknown) {
-    const result = DeleteFavoriteSchema.safeParse(body);
-
-    if (!result.success) {
-      throw new BadRequestException(result.error.issues[0].message);
+  async remove(@Req() req: any, @Body() body: any) {
+    const userId = req.session?.user?.id;
+    if (!userId) {
+      throw new UnauthorizedException('Please login first');
     }
 
-    return this.favoritesService.remove(result.data);
+    if (!body.propertyId) {
+        throw new BadRequestException('Property ID is required');
+    }
+
+    return this.favoritesService.remove({ 
+        userId: Number(userId), 
+        propertyId: Number(body.propertyId) 
+    });
   }
 }

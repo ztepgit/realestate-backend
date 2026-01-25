@@ -6,19 +6,36 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
 const express_session_1 = __importDefault(require("express-session"));
+const connect_pg_simple_1 = __importDefault(require("connect-pg-simple"));
+const pg_1 = require("pg");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    const dbPool = new pg_1.Pool({
+        connectionString: process.env.DATABASE_URL,
+    });
+    const PGStore = (0, connect_pg_simple_1.default)(express_session_1.default);
     app.enableCors({
-        origin: 'http://localhost:3000',
+        origin: process.env.FRONTEND_URL || 'http://localhost:3000',
         credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
     });
     app.use((0, express_session_1.default)({
-        secret: 'my-secret-key',
+        store: new PGStore({
+            pool: dbPool,
+            tableName: 'session',
+            createTableIfMissing: true,
+        }),
+        name: 'connect.sid',
+        secret: process.env.SESSION_SECRET || 'my-secret-key',
         resave: false,
         saveUninitialized: false,
+        rolling: true,
         cookie: {
-            maxAge: 7 * 24 * 60 * 60 * 1000,
+            maxAge: 24 * 60 * 60 * 1000,
             httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
         },
     }));
     const port = process.env.PORT || 8080;

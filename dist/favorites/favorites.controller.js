@@ -15,50 +15,67 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FavoritesController = void 0;
 const common_1 = require("@nestjs/common");
 const favorites_service_1 = require("./favorites.service");
-const favorite_dto_1 = require("./dto/favorite.dto");
 let FavoritesController = class FavoritesController {
     favoritesService;
     constructor(favoritesService) {
         this.favoritesService = favoritesService;
     }
-    async create(body) {
-        const result = favorite_dto_1.CreateFavoriteSchema.safeParse(body);
-        if (!result.success) {
-            throw new common_1.BadRequestException(result.error.issues[0].message);
+    async getMyFavorites(req) {
+        const userId = req.session?.user?.id;
+        if (!userId) {
+            throw new common_1.UnauthorizedException('Please login');
         }
-        return this.favoritesService.create(result.data);
+        return this.favoritesService.findByUser(Number(userId));
     }
-    findByUser(userId) {
-        return this.favoritesService.findByUser(userId);
-    }
-    async remove(body) {
-        const result = favorite_dto_1.DeleteFavoriteSchema.safeParse(body);
-        if (!result.success) {
-            throw new common_1.BadRequestException(result.error.issues[0].message);
+    async create(req, body) {
+        const userId = req.session?.user?.id;
+        if (!userId) {
+            throw new common_1.UnauthorizedException('Please login first');
         }
-        return this.favoritesService.remove(result.data);
+        if (!body.propertyId) {
+            throw new common_1.BadRequestException('Property ID is required');
+        }
+        return this.favoritesService.create({
+            userId: Number(userId),
+            propertyId: Number(body.propertyId)
+        });
+    }
+    async remove(req, body) {
+        const userId = req.session?.user?.id;
+        if (!userId) {
+            throw new common_1.UnauthorizedException('Please login first');
+        }
+        if (!body.propertyId) {
+            throw new common_1.BadRequestException('Property ID is required');
+        }
+        return this.favoritesService.remove({
+            userId: Number(userId),
+            propertyId: Number(body.propertyId)
+        });
     }
 };
 exports.FavoritesController = FavoritesController;
 __decorate([
-    (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
+    (0, common_1.Get)('my-favorites'),
+    __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
+], FavoritesController.prototype, "getMyFavorites", null);
+__decorate([
+    (0, common_1.Post)(),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
 ], FavoritesController.prototype, "create", null);
 __decorate([
-    (0, common_1.Get)(':userId'),
-    __param(0, (0, common_1.Param)('userId', common_1.ParseIntPipe)),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", void 0)
-], FavoritesController.prototype, "findByUser", null);
-__decorate([
     (0, common_1.Delete)(),
-    __param(0, (0, common_1.Body)()),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], FavoritesController.prototype, "remove", null);
 exports.FavoritesController = FavoritesController = __decorate([

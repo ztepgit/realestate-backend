@@ -7,12 +7,12 @@ export declare class PropertiesService implements OnModuleInit {
     seedProperties(): Promise<void>;
     findAll(): Promise<{
         id: number;
+        createdAt: Date;
         title: string;
         location: string;
         price: number;
         description: string;
         image: string;
-        createdAt: Date;
         agentName: string;
         agentCompany: string;
         agentPhone: string;
@@ -20,12 +20,12 @@ export declare class PropertiesService implements OnModuleInit {
     }[]>;
     findOne(id: number): Promise<{
         id: number;
+        createdAt: Date;
         title: string;
         location: string;
         price: number;
         description: string;
         image: string;
-        createdAt: Date;
         agentName: string;
         agentCompany: string;
         agentPhone: string;

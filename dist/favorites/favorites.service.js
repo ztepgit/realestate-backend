@@ -12,18 +12,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FavoritesService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const client_1 = require("@prisma/client");
 let FavoritesService = class FavoritesService {
     prisma;
     constructor(prisma) {
         this.prisma = prisma;
     }
     async create(dto) {
-        const user = await this.prisma.user.findUnique({
-            where: { id: dto.userId },
-        });
-        if (!user) {
-            throw new common_1.NotFoundException('User not found');
-        }
         const property = await this.prisma.property.findUnique({
             where: { id: dto.propertyId },
         });
@@ -39,7 +34,7 @@ let FavoritesService = class FavoritesService {
             },
         });
         if (existing) {
-            throw new common_1.ConflictException('Property already favorited');
+            return existing;
         }
         return this.prisma.favorite.create({
             data: {
@@ -52,12 +47,6 @@ let FavoritesService = class FavoritesService {
         });
     }
     async findByUser(userId) {
-        const user = await this.prisma.user.findUnique({
-            where: { id: userId },
-        });
-        if (!user) {
-            throw new common_1.NotFoundException('User not found');
-        }
         return this.prisma.favorite.findMany({
             where: { userId },
             include: {
@@ -67,25 +56,22 @@ let FavoritesService = class FavoritesService {
         });
     }
     async remove(dto) {
-        const favorite = await this.prisma.favorite.findUnique({
-            where: {
-                userId_propertyId: {
-                    userId: dto.userId,
-                    propertyId: dto.propertyId,
+        try {
+            await this.prisma.favorite.delete({
+                where: {
+                    userId_propertyId: {
+                        userId: dto.userId,
+                        propertyId: dto.propertyId,
+                    },
                 },
-            },
-        });
-        if (!favorite) {
-            throw new common_1.NotFoundException('Favorite not found');
+            });
         }
-        await this.prisma.favorite.delete({
-            where: {
-                userId_propertyId: {
-                    userId: dto.userId,
-                    propertyId: dto.propertyId,
-                },
-            },
-        });
+        catch (error) {
+            if (error instanceof client_1.Prisma.PrismaClientKnownRequestError &&
+                error.code !== 'P2025') {
+                throw error;
+            }
+        }
         return { message: 'Favorite removed successfully' };
     }
 };
