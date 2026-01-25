@@ -1,16 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import session from 'express-session';
-import pgSession from 'connect-pg-simple'; // 1. import ตัวนี้มา
-import { Pool } from 'pg'; // 2. import pg pool
+import pgSession from 'connect-pg-simple';
+import { Pool } from 'pg';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const isProd = process.env.NODE_ENV === 'production';
 
-  // trust proxy (ต้องทำผ่าน express)
+  // trust proxy (จำเป็นเมื่ออยู่หลัง Railway / Vercel)
   const server = app.getHttpAdapter().getInstance();
   server.set('trust proxy', 1);
+
+  if (!process.env.SESSION_SECRET) {
+    throw new Error('SESSION_SECRET is not defined');
+  }
 
   const dbPool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -18,8 +22,12 @@ async function bootstrap() {
 
   const PGStore = pgSession(session);
 
+  const allowedOrigins = process.env.FRONTEND_URL
+    ? process.env.FRONTEND_URL.split(',')
+    : ['http://localhost:3000'];
+
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: allowedOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -33,7 +41,7 @@ async function bootstrap() {
         createTableIfMissing: true,
       }),
       name: 'connect.sid',
-      secret: process.env.SESSION_SECRET || 'my-secret-key',
+      secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
       rolling: true,
