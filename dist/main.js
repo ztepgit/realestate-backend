@@ -15,7 +15,7 @@ async function bootstrap() {
     });
     const PGStore = (0, connect_pg_simple_1.default)(express_session_1.default);
     app.enableCors({
-        origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+        origin: 'http://localhost:3000',
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
