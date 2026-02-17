@@ -13,15 +13,21 @@ async function bootstrap() {
     const isProd = process.env.NODE_ENV === 'production';
     const server = app.getHttpAdapter().getInstance();
     server.set('trust proxy', 1);
+    if (!process.env.SESSION_SECRET) {
+        throw new Error('SESSION_SECRET is not defined');
+    }
     const dbPool = new pg_1.Pool({
-        connectionString: process.env.DATABASE_URL,
+        connectionString: process.env.DIRECT_URL,
     });
     const PGStore = (0, connect_pg_simple_1.default)(express_session_1.default);
+    const allowedOrigins = process.env.FRONTEND_URL
+        ? process.env.FRONTEND_URL.split(',')
+        : ['http://localhost:3000'];
     app.enableCors({
         origin: 'http://localhost:3000',
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
+        allowedHeaders: '*',
     });
     app.use((0, express_session_1.default)({
         store: new PGStore({
@@ -30,7 +36,7 @@ async function bootstrap() {
             createTableIfMissing: true,
         }),
         name: 'connect.sid',
-        secret: process.env.SESSION_SECRET || 'my-secret-key',
+        secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
         rolling: true,

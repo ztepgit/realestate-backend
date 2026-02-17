@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import session from 'express-session';
 import pgSession from 'connect-pg-simple';
-import { Pool } from 'pg';git
+import { Pool } from 'pg'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
